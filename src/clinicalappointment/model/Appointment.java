@@ -4,6 +4,11 @@ public class Appointment {
 	private final Patient patient;
 	private final Hospital hospital;
 
+	public Appointment() {
+		this.patient = null;
+		this.hospital = null;
+	}
+
 	public Appointment(Patient patient, Hospital hospital) {
 		this.patient = patient;
 		this.hospital = hospital;
@@ -17,4 +22,3 @@ public class Appointment {
 		return "Appointment: " + patient + " -> " + hospital;
 	}
 }
-
