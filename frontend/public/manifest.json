@@ -1,0 +1,10 @@
+{
+  "short_name": "Clinical",
+  "name": "Clinical Appointment Frontend",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "description": "Frontend for Clinical Appointment app"
+}
+
+
