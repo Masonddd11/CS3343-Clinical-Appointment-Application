@@ -3,6 +3,8 @@ package clinicalappointment.service;
 import clinicalappointment.model.Hospital;
 import clinicalappointment.model.HospitalEntity;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +12,36 @@ import java.util.stream.Collectors;
 
 @Service
 public class HospitalService {
+    private static final Logger logger = LoggerFactory.getLogger(HospitalService.class);
+
     private final HospitalRepository hospitalRepository;
     private List<Hospital> hospitals = new ArrayList<>();
 
     public HospitalService(HospitalRepository hospitalRepository) {
         this.hospitalRepository = hospitalRepository;
-        // load hospitals from DB; if empty, seed and save
+        // load hospitals from DB; if empty or missing many entries, seed and save
         List<HospitalEntity> entities = hospitalRepository.findAll();
-        if (entities.isEmpty()) {
+
+        // Count A&E hospitals in resource so we can decide whether to reseed when DB is incomplete
+        int aeCount = 0;
+        try (var is = getClass().getClassLoader().getResourceAsStream("data/hospitals_ha.json")) {
+            if (is != null) {
+                java.nio.charset.Charset utf8 = java.nio.charset.StandardCharsets.UTF_8;
+                String json = new String(is.readAllBytes(), utf8);
+                var mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                var node = mapper.readTree(json);
+                if (node.isArray()) {
+                    for (var item : node) {
+                        String aeFlag = item.path("with_AE_service_eng").asText("");
+                        if (aeFlag != null && "yes".equalsIgnoreCase(aeFlag.trim())) aeCount++;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            logger.debug("Could not count A&E hospitals from resource", ex);
+        }
+
+        if (entities.isEmpty() || (aeCount > 0 && entities.size() < aeCount)) {
             seedDefaults();
         } else {
             this.hospitals = entities.stream().map(this::toModel).collect(Collectors.toList());
@@ -36,16 +60,41 @@ public class HospitalService {
                 if (node.isArray()) {
                     List<HospitalEntity> list = new java.util.ArrayList<>();
                     for (var item : node) {
+                        // Only include hospitals that explicitly have A&E service marked as "Yes"
+                        String aeFlag = item.path("with_AE_service_eng").asText("");
+                        if (aeFlag == null || !"yes".equalsIgnoreCase(aeFlag.trim())) {
+                            // skip non-A&E hospitals
+                            continue;
+                        }
+
                         String name = item.path("institution_eng").asText();
                         double lat = item.path("latitude").asDouble(0.0);
                         double lon = item.path("longitude").asDouble(0.0);
-                        String district = item.path("address_eng").asText("");
+                        String address = item.path("address_eng").asText("");
+                        // Normalize district from address (e.g. "..., Tuen Mun, NT" -> "Tuen Mun")
+                        String district = address;
+                        if (address != null && address.contains(",")) {
+                            String[] parts = address.split(",");
+                            for (int i = 0; i < parts.length; i++) parts[i] = parts[i].trim();
+                            if (parts.length >= 2) {
+                                String last = parts[parts.length - 1].toLowerCase().trim();
+                                // If last token indicates region/country like "NT", "N.T.", "New Territories", or "HK", treat the token before it as district
+                                if (last.equals("nt") || last.equals("n.t.") || last.equals("n.t") || last.contains("new territor")) {
+                                    district = parts[parts.length - 2];
+                                } else if (last.equals("hk") || last.equals("h.k.") || last.equals("h.k") || last.contains("hong kong")) {
+                                    district = parts[parts.length - 2];
+                                } else {
+                                    district = parts[parts.length - 1];
+                                }
+                            }
+                        }
+
                         String cluster = item.path("cluster_eng").asText("");
                         String region = "";
                         // infer region from cluster or address
                         if (cluster != null && cluster.toLowerCase().contains("hong kong")) region = "Hong Kong Island";
                         if (cluster != null && cluster.toLowerCase().contains("kowloon")) region = "Kowloon";
-                        if (cluster != null && cluster.toLowerCase().contains("new territories") || cluster != null && cluster.toLowerCase().contains("new territory")) region = "New Territories";
+                        if ((cluster != null && cluster.toLowerCase().contains("new territories")) || (cluster != null && cluster.toLowerCase().contains("new territory"))) region = "New Territories";
                         if (district != null && district.toLowerCase().contains("lantau")) region = "Lantau Island";
 
                         HospitalEntity e = new HospitalEntity(name, lat, lon, district, region);
@@ -58,7 +107,7 @@ public class HospitalService {
             }
         } catch (Exception ex) {
             // fall back to embedded seed
-            ex.printStackTrace();
+            logger.warn("Failed to load hospitals from data/hospitals_ha.json, falling back to embedded seeds", ex);
         }
 
         // If resource not found or failed, use previous inline seeds

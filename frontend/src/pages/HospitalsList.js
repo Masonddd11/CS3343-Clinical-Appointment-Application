@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getHospitals } from "../api";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, CircleMarker } from 'react-leaflet';
+import { getHospitals, getAeWaitTimesMap } from "../api";
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 
 // fix default icon issue in some bundlers
@@ -50,6 +50,7 @@ export default function HospitalsList() {
   const [nearest, setNearest] = useState(null);
   const [transport, setTransport] = useState("driving");
   const [region, setRegion] = useState("");
+  const [aeMap, setAeMap] = useState({});
 
   const regionMap = {
     'Hong Kong Island': new Set(['Pok Fu Lam','Chai Wan','Wan Chai','Causeway Bay','Sheung Wan','Central','Wan Chai']),
@@ -69,6 +70,9 @@ export default function HospitalsList() {
       .then((data) => setHospitals(data))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
+
+    // fetch AE wait times map (non-critical)
+    getAeWaitTimesMap().then(m => setAeMap(m)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -190,6 +194,9 @@ export default function HospitalsList() {
               <Popup>
                 <div><strong>{h.name}</strong></div>
                 <div>{h.district}</div>
+                {aeMap && (aeMap[h.name] || aeMap[h.name?.trim()]) && (
+                  <div style={{ marginTop: 6, fontSize: 13, color: '#222' }}>A&E: { (aeMap[h.name]?.t3p50 || aeMap[h.name?.trim()]?.t3p50 || 'N/A') }</div>
+                )}
               </Popup>
             </Marker>
           ))}
@@ -214,6 +221,9 @@ export default function HospitalsList() {
               <div>
                 <strong style={{ fontSize: 16 }}>{h.name}</strong>
                 <div style={{ fontSize: 13, color: '#666' }}>district: {h.district} — location: ({h.x}, {h.y})</div>
+                {aeMap && (aeMap[h.name] || aeMap[h.name?.trim()]) && (
+                  <div style={{ marginTop: 6, fontSize: 13, color: '#222' }}>A&E: { (aeMap[h.name]?.t3p50 || aeMap[h.name?.trim()]?.t3p50 || 'N/A') }</div>
+                )}
               </div>
               <div>
                 <Link to={`/hospitals/${h.nodeId}`} style={{ marginLeft: 8 }}>Details</Link>

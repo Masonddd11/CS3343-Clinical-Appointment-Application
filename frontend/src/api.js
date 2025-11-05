@@ -1,5 +1,5 @@
-// Default to port 8081 per user's environment; allow override with REACT_APP_API_BASE
-const BASE = process.env.REACT_APP_API_BASE || "http://localhost:8081/api";
+// Default to port 8082 per backend configuration; allow override with REACT_APP_API_BASE
+const BASE = process.env.REACT_APP_API_BASE || "http://localhost:8082/api";
 
 async function extractError(res) {
   let text = "";
@@ -25,7 +25,7 @@ async function fetchWithNetworkHint(url, opts) {
     // network-level failure (DNS, connection refused, CORS preflight that failed, etc.)
     throw new Error(
       `Network error when fetching ${url}. Make sure the backend server is running on ${
-        process.env.REACT_APP_API_BASE || "http://localhost:8081/api"
+        process.env.REACT_APP_API_BASE || "http://localhost:8082/api"
       } and accepts requests from this origin. Original error: ${e.message}`
     );
   }
@@ -119,4 +119,17 @@ export async function reverseGeocode(lat, lon) {
   if (!res.ok) throw new Error(`Reverse geocoding failed: ${res.status} ${res.statusText}`);
   const j = await res.json();
   return j;
+}
+
+// AE wait time endpoints
+export async function getAeWaitTimes() {
+  const res = await fetchWithNetworkHint(`${BASE}/ae-wait-times`);
+  if (!res.ok) throw new Error(await extractError(res));
+  return res.json();
+}
+
+export async function getAeWaitTimesMap() {
+  const res = await fetchWithNetworkHint(`${BASE}/ae-wait-times/map`);
+  if (!res.ok) throw new Error(await extractError(res));
+  return res.json();
 }
