@@ -12,11 +12,13 @@ This is a Spring Boot application for managing clinical appointments with intell
 ## Running the Application
 
 1. **Build the project:**
+
    ```bash
    mvn clean install
    ```
 
 2. **Run the application:**
+
    ```bash
    mvn spring-boot:run
    ```
@@ -53,24 +55,10 @@ com.hospital.management.demo
 ## API Endpoints
 
 The application will have REST endpoints following the structure defined in the RPD:
+
 - `/api/auth/**` - Authentication endpoints
 - `/api/patients/**` - Patient endpoints
 - `/api/doctors/**` - Doctor endpoints
 - `/api/hospitals/**` - Hospital endpoints
 - `/api/appointments/**` - Appointment endpoints
 - `/api/admin/**` - Admin endpoints
-
-## Security
-
-- Spring Security is configured (currently with basic setup)
-- CSRF is disabled for API development
-- H2 console is accessible without authentication
-
-## Next Steps
-
-1. Implement authentication service and controllers
-2. Create DTOs for API requests/responses
-3. Implement business logic services
-4. Add pathfinding algorithm implementation
-5. Create REST controllers
-
