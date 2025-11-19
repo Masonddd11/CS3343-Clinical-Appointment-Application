@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -141,8 +142,8 @@ public class DataInitializer implements CommandLineRunner {
                 114.17
         );
 
-        createSymptomIfNotExists("kidney pain", urology, 1);
-        createSymptomIfNotExists("heart pain", cardiology, 1);
+        createSymptomIfNotExists("kidney pain", urology, 1, List.of("renal pain", "flank pain", "kidney discomfort"));
+        createSymptomIfNotExists("heart pain", cardiology, 1, List.of("chest pain", "cardiac pain", "chest tightness"));
 
         createSampleAppointmentIfAbsent(patientChan, doctorWong, queenElizabeth, urology);
     }
@@ -285,7 +286,7 @@ public class DataInitializer implements CommandLineRunner {
         return patient;
     }
 
-    private void createSymptomIfNotExists(String symptomText, Department department, int priority) {
+    private void createSymptomIfNotExists(String symptomText, Department department, int priority, List<String> keywords) {
         boolean exists = symptomRepository.findBySymptomContainingIgnoreCase(symptomText).stream()
                 .anyMatch(symptom -> symptom.getSymptom().equalsIgnoreCase(symptomText));
 
@@ -297,6 +298,7 @@ public class DataInitializer implements CommandLineRunner {
                 .symptom(symptomText)
                 .recommendedDepartment(department)
                 .priority(priority)
+                .keywords(keywords)
                 .build();
 
         symptomRepository.save(symptom);
