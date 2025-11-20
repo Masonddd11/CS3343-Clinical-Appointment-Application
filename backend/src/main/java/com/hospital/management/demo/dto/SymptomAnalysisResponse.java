@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -13,6 +15,8 @@ public class SymptomAnalysisResponse {
     private Long departmentId;
     private String departmentName;
     private String departmentCode;
+    private Double confidenceScore;
+    private List<String> matchedKeywords;
     private String message;
 }
 
