@@ -67,7 +67,31 @@ switch -wildcard -casesensitive ( $($distributionUrl -replace '^.*/','') ) {
     $USE_MVND = $false
     $MVN_CMD = $script -replace '^mvnw','mvn'
     break
-  }
+  ## Security
+
+- Spring Security is configured (currently with basic setup)
+- CSRF is disabled for API development
+- H2 console is accessible without authentication
+
+## Next Steps
+
+1. Implement authentication service and controllers
+2. Create DTOs for API requests/responses
+3. Implement business logic services
+4. Add pathfinding algorithm implementation
+5. Create REST controllers## Security
+
+- Spring Security is configured (currently with basic setup)
+- CSRF is disabled for API development
+- H2 console is accessible without authentication
+
+## Next Steps
+
+1. Implement authentication service and controllers
+2. Create DTOs for API requests/responses
+3. Implement business logic services
+4. Add pathfinding algorithm implementation
+5. Create REST controllers}
 }
 
 # apply MVNW_REPOURL and calculate MAVEN_HOME

@@ -16,4 +16,3 @@ public class HospitalRecommendationRequest {
 
     private Integer maxResults;
 }
-
