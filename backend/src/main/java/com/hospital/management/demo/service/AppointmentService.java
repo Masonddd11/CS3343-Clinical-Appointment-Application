@@ -98,21 +98,6 @@ public class AppointmentService {
         return mapToResponse(appointment);
     }
 
-    @Transactional
-    public AppointmentResponse bookAppointmentWithPathfindingScore(Long patientId, AppointmentRequest request, Double pathfindingScore) {
-        AppointmentResponse response = bookAppointment(patientId, request);
-        
-        if (pathfindingScore != null) {
-            Appointment appointment = appointmentRepository.findById(response.getId())
-                    .orElseThrow(() -> new RuntimeException("Appointment not found"));
-            appointment.setPathfindingScore(pathfindingScore);
-            appointmentRepository.save(appointment);
-            return mapToResponse(appointment);
-        }
-        
-        return response;
-    }
-
     public List<AppointmentResponse> getPatientAppointments(Long patientId) {
         return appointmentRepository.findByPatientId(patientId).stream()
                 .map(this::mapToResponse)

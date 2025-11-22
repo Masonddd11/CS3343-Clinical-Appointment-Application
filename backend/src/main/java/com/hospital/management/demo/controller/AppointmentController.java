@@ -1,13 +1,14 @@
 package com.hospital.management.demo.controller;
 
-import com.hospital.management.demo.dto.*;
+import com.hospital.management.demo.dto.AppointmentRequest;
+import com.hospital.management.demo.dto.AppointmentResponse;
+import com.hospital.management.demo.dto.RescheduleAppointmentRequest;
 import com.hospital.management.demo.model.entity.Patient;
 import com.hospital.management.demo.model.entity.User;
 import com.hospital.management.demo.model.enums.UserRole;
 import com.hospital.management.demo.repository.DoctorRepository;
 import com.hospital.management.demo.repository.PatientRepository;
 import com.hospital.management.demo.service.AppointmentService;
-import com.hospital.management.demo.service.BookingRecommendationService;
 import com.hospital.management.demo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,6 @@ public class AppointmentController {
     private final UserService userService;
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
-    private final BookingRecommendationService bookingRecommendationService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('PATIENT', 'ADMIN')")
@@ -46,26 +46,6 @@ public class AppointmentController {
         }
         
         return ResponseEntity.ok(appointmentService.bookAppointment(patient.getId(), request));
-    }
-
-    @PostMapping("/smart")
-    @PreAuthorize("hasAnyRole('PATIENT', 'ADMIN')")
-    public ResponseEntity<SmartAppointmentResponse> bookAppointmentSmart(@Valid @RequestBody SmartAppointmentRequest request) {
-        User currentUser = userService.getCurrentUser();
-        
-        if (currentUser.getRole() != UserRole.PATIENT) {
-            throw new RuntimeException("Smart booking is only available for patients");
-        }
-
-        Patient patient = patientRepository.findByUserId(currentUser.getId())
-                .orElseThrow(() -> new RuntimeException("Patient profile not found"));
-
-        SmartAppointmentResponse response = bookingRecommendationService.processSmartBooking(
-                patient.getId(), 
-                request
-        );
-
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/patient")
