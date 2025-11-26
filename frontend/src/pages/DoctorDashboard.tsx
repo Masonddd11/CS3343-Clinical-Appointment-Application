@@ -1,45 +1,40 @@
 import React, { useState, useEffect } from "react";
 import {
   Card,
-  Row,
-  Col,
-  Statistic,
-  Button,
   Table,
+  Button,
   Tag,
-  Space,
   message,
   Modal,
   Descriptions,
+  Statistic,
+  Row,
+  Col,
+  Space,
 } from "antd";
 import {
   CalendarOutlined,
-  PlusOutlined,
-  MedicineBoxOutlined,
-  EyeOutlined,
-  DeleteOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
 import { appointmentApi } from "../api/appointmentApi";
 import type { AppointmentResponse } from "../types/appointment";
 import dayjs from "dayjs";
 
-const PatientDashboard: React.FC = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
+const DoctorDashboard: React.FC = () => {
   const [appointments, setAppointments] = useState<AppointmentResponse[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentResponse | null>(null);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<AppointmentResponse | null>(null);
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
 
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const data = await appointmentApi.getPatientAppointments();
+      const data = await appointmentApi.getDoctorAppointments();
       setAppointments(data);
-    } catch (error: any) {
+    } catch (error) {
       message.error("Failed to fetch appointments");
     } finally {
       setLoading(false);
@@ -50,13 +45,13 @@ const PatientDashboard: React.FC = () => {
     fetchAppointments();
   }, []);
 
-  const handleCancelAppointment = async (id: number) => {
+  const handleMarkCompleted = async (id: number) => {
     try {
-      await appointmentApi.cancelAppointment(id);
-      message.success("Appointment cancelled successfully");
+      await appointmentApi.markAppointmentCompleted(id);
+      message.success("Appointment marked as completed");
       fetchAppointments();
     } catch (error: any) {
-      message.error(error.response?.data?.message || "Failed to cancel appointment");
+      message.error(error.response?.data?.message || "Failed to update appointment");
     }
   };
 
@@ -81,7 +76,8 @@ const PatientDashboard: React.FC = () => {
       dataIndex: "appointmentDate",
       key: "appointmentDate",
       render: (date: string) => dayjs(date).format("MMM DD, YYYY"),
-      sorter: (a, b) => dayjs(a.appointmentDate).unix() - dayjs(b.appointmentDate).unix(),
+      sorter: (a, b) =>
+        dayjs(a.appointmentDate).unix() - dayjs(b.appointmentDate).unix(),
     },
     {
       title: "Time",
@@ -90,9 +86,9 @@ const PatientDashboard: React.FC = () => {
       render: (time: string) => dayjs(time, "HH:mm:ss").format("hh:mm A"),
     },
     {
-      title: "Doctor",
-      dataIndex: "doctorName",
-      key: "doctorName",
+      title: "Patient",
+      dataIndex: "patientName",
+      key: "patientName",
     },
     {
       title: "Hospital",
@@ -100,27 +96,47 @@ const PatientDashboard: React.FC = () => {
       key: "hospitalName",
     },
     {
+      title: "Department",
+      dataIndex: "departmentName",
+      key: "departmentName",
+    },
+    {
+      title: "Reason",
+      dataIndex: "reasonForVisit",
+      key: "reasonForVisit",
+      ellipsis: true,
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: string) => <Tag color={getStatusColor(status)}>{status}</Tag>,
+      render: (status: string) => (
+        <Tag color={getStatusColor(status)}>{status}</Tag>
+      ),
+      filters: [
+        { text: "Pending", value: "PENDING" },
+        { text: "Confirmed", value: "CONFIRMED" },
+        { text: "Completed", value: "COMPLETED" },
+        { text: "Cancelled", value: "CANCELLED" },
+      ],
+      onFilter: (value, record) => record.status === value,
     },
     {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Button size="small" icon={<EyeOutlined />} onClick={() => showDetails(record)}>
-            View
+          <Button size="small" onClick={() => showDetails(record)}>
+            Details
           </Button>
-          {(record.status === "CONFIRMED" || record.status === "PENDING") && (
+          {record.status === "CONFIRMED" && (
             <Button
               size="small"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => handleCancelAppointment(record.id)}
+              type="primary"
+              icon={<CheckCircleOutlined />}
+              onClick={() => handleMarkCompleted(record.id)}
             >
-              Cancel
+              Complete
             </Button>
           )}
         </Space>
@@ -131,40 +147,22 @@ const PatientDashboard: React.FC = () => {
   const upcomingAppointments = appointments.filter(
     (apt) => apt.status === "CONFIRMED" || apt.status === "PENDING"
   );
+  const completedToday = appointments.filter(
+    (apt) =>
+      apt.status === "COMPLETED" &&
+      dayjs(apt.appointmentDate).isSame(dayjs(), "day")
+  );
 
   return (
     <div className="space-y-6" style={{ padding: '24px' }}>
-      <div className="flex justify-between items-center" style={{
-        background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+      <div style={{
+        background: 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)',
         padding: '32px',
         borderRadius: '16px',
-        boxShadow: '0 8px 24px rgba(168, 237, 234, 0.15)'
+        boxShadow: '0 8px 24px rgba(137, 247, 254, 0.15)'
       }}>
-        <div>
-          <h1 className="text-3xl font-bold" style={{ color: '#2d3748', marginBottom: '8px' }}>
-            Welcome back, {user?.email?.split("@")[0]}!
-          </h1>
-          <p style={{ color: '#4a5568', fontSize: '16px' }}>
-            Manage your appointments and health records
-          </p>
-        </div>
-        <Button
-          type="primary"
-          size="large"
-          icon={<PlusOutlined />}
-          onClick={() => navigate("/book-appointment")}
-          style={{
-            background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-            borderColor: 'transparent',
-            fontWeight: 600,
-            height: '44px',
-            paddingLeft: '24px',
-            paddingRight: '24px',
-            boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
-          }}
-        >
-          Book Appointment
-        </Button>
+        <h1 className="text-3xl font-bold" style={{ color: '#ffffff', marginBottom: '8px' }}>Doctor Dashboard</h1>
+        <p style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '16px' }}>Manage your appointments and schedule</p>
       </div>
 
       <Row gutter={16}>
@@ -181,20 +179,19 @@ const PatientDashboard: React.FC = () => {
         <Col xs={24} sm={12} md={8}>
           <Card>
             <Statistic
-              title="Total Appointments"
-              value={appointments.length}
-              prefix={<CalendarOutlined />}
+              title="Completed Today"
+              value={completedToday.length}
+              prefix={<CheckCircleOutlined />}
+              valueStyle={{ color: "#1890ff" }}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
           <Card>
             <Statistic
-              title="Quick Access"
-              value="Book Now"
-              prefix={<MedicineBoxOutlined />}
-              valueStyle={{ color: "#1890ff", cursor: "pointer" }}
-              onClick={() => navigate("/book-appointment")}
+              title="Total Appointments"
+              value={appointments.length}
+              prefix={<ClockCircleOutlined />}
             />
           </Card>
         </Col>
@@ -218,18 +215,35 @@ const PatientDashboard: React.FC = () => {
           <Button key="close" onClick={() => setDetailsModalVisible(false)}>
             Close
           </Button>,
+          selectedAppointment?.status === "CONFIRMED" && (
+            <Button
+              key="complete"
+              type="primary"
+              icon={<CheckCircleOutlined />}
+              onClick={() => {
+                if (selectedAppointment) {
+                  handleMarkCompleted(selectedAppointment.id);
+                  setDetailsModalVisible(false);
+                }
+              }}
+            >
+              Mark Complete
+            </Button>
+          ),
         ]}
       >
         {selectedAppointment && (
           <Descriptions bordered column={1}>
-            <Descriptions.Item label="Doctor">
-              {selectedAppointment.doctorName}
+            <Descriptions.Item label="Patient">
+              {selectedAppointment.patientName}
             </Descriptions.Item>
             <Descriptions.Item label="Date">
               {dayjs(selectedAppointment.appointmentDate).format("MMMM DD, YYYY")}
             </Descriptions.Item>
             <Descriptions.Item label="Time">
-              {dayjs(selectedAppointment.appointmentTime, "HH:mm:ss").format("hh:mm A")}
+              {dayjs(selectedAppointment.appointmentTime, "HH:mm:ss").format(
+                "hh:mm A"
+              )}
             </Descriptions.Item>
             <Descriptions.Item label="Hospital">
               {selectedAppointment.hospitalName}
@@ -237,8 +251,8 @@ const PatientDashboard: React.FC = () => {
             <Descriptions.Item label="Department">
               {selectedAppointment.departmentName}
             </Descriptions.Item>
-            <Descriptions.Item label="Reason">
-              {selectedAppointment.reasonForVisit || "N/A"}
+            <Descriptions.Item label="Reason for Visit">
+              {selectedAppointment.reasonForVisit}
             </Descriptions.Item>
             <Descriptions.Item label="Symptoms">
               {selectedAppointment.symptoms || "N/A"}
@@ -248,6 +262,11 @@ const PatientDashboard: React.FC = () => {
                 {selectedAppointment.status}
               </Tag>
             </Descriptions.Item>
+            {selectedAppointment.notes && (
+              <Descriptions.Item label="Notes">
+                {selectedAppointment.notes}
+              </Descriptions.Item>
+            )}
           </Descriptions>
         )}
       </Modal>
@@ -255,5 +274,4 @@ const PatientDashboard: React.FC = () => {
   );
 };
 
-export default PatientDashboard;
-
+export default DoctorDashboard;
