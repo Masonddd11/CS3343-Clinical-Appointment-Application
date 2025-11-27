@@ -61,4 +61,20 @@ export const appointmentApi = {
     );
     return response.data;
   },
+
+  getAllAppointments: async (): Promise<AppointmentResponse[]> => {
+    const response = await apiClient.get<AppointmentResponse[]>("/appointments");
+    return response.data;
+  },
+
+  updateAppointmentStatus: async (
+    id: number,
+    status: "CONFIRMED" | "CANCELLED" | "COMPLETED"
+  ): Promise<AppointmentResponse> => {
+    const response = await apiClient.put<AppointmentResponse>(
+      `/appointments/${id}/status`,
+      { status }
+    );
+    return response.data;
+  },
 };

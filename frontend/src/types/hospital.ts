@@ -11,6 +11,7 @@ export interface HospitalResponse {
   currentIntensity: number;
   operationalStatus: OperationalStatus;
   closureReason?: string;
+  hasAccidentAndEmergency: boolean;
 }
 
 export interface HospitalRequest {
@@ -23,4 +24,5 @@ export interface HospitalRequest {
   currentIntensity: number;
   operationalStatus: OperationalStatus;
   closureReason?: string;
+  hasAccidentAndEmergency?: boolean;
 }

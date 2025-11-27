@@ -8,6 +8,7 @@ import {
   LogoutOutlined,
   DashboardOutlined,
   TeamOutlined,
+  CalendarOutlined as AdminCalendarOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
@@ -76,6 +77,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           key: "/admin/doctors",
           icon: <UserOutlined />,
           label: "Manage Doctors",
+        },
+        {
+          key: "/admin/appointments",
+          icon: <AdminCalendarOutlined />,
+          label: "Manage Appointments",
         },
       ];
     }
@@ -166,4 +172,3 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 };
 
 export default Layout;
-

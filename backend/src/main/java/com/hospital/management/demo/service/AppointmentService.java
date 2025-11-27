@@ -2,6 +2,7 @@ package com.hospital.management.demo.service;
 
 import com.hospital.management.demo.dto.AppointmentRequest;
 import com.hospital.management.demo.dto.AppointmentResponse;
+import com.hospital.management.demo.dto.DashboardSummaryResponse;
 import com.hospital.management.demo.dto.RescheduleAppointmentRequest;
 import com.hospital.management.demo.model.entity.Appointment;
 import com.hospital.management.demo.model.entity.Department;
@@ -15,6 +16,7 @@ import com.hospital.management.demo.repository.DepartmentRepository;
 import com.hospital.management.demo.repository.DoctorRepository;
 import com.hospital.management.demo.repository.HospitalRepository;
 import com.hospital.management.demo.repository.PatientRepository;
+import com.hospital.management.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,7 @@ public class AppointmentService {
     private final DoctorRepository doctorRepository;
     private final HospitalRepository hospitalRepository;
     private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public AppointmentResponse bookAppointment(Long patientId, AppointmentRequest request) {
@@ -96,6 +99,12 @@ public class AppointmentService {
 
         appointment = appointmentRepository.save(appointment);
         return mapToResponse(appointment);
+    }
+
+    public List<AppointmentResponse> getAllAppointments() {
+        return appointmentRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     public List<AppointmentResponse> getPatientAppointments(Long patientId) {
@@ -195,6 +204,39 @@ public class AppointmentService {
         return mapToResponse(appointment);
     }
 
+    @Transactional
+    public AppointmentResponse updateAppointmentStatus(Long appointmentId, AppointmentStatus status) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        if (status == AppointmentStatus.CANCELLED && appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new RuntimeException("Cannot cancel a completed appointment");
+        }
+
+        appointment.setStatus(status);
+        appointment = appointmentRepository.save(appointment);
+        return mapToResponse(appointment);
+    }
+
+    public DashboardSummaryResponse getDashboardSummary() {
+        long totalAppointments = appointmentRepository.count();
+        long pending = appointmentRepository.countByStatus(AppointmentStatus.PENDING);
+        long confirmed = appointmentRepository.countByStatus(AppointmentStatus.CONFIRMED);
+        long completed = appointmentRepository.countByStatus(AppointmentStatus.COMPLETED);
+
+        return DashboardSummaryResponse.builder()
+                .totalUsers(userRepository.count())
+                .totalPatients(patientRepository.count())
+                .totalDoctors(doctorRepository.count())
+                .totalHospitals(hospitalRepository.count())
+                .totalDepartments(departmentRepository.count())
+                .totalAppointments(totalAppointments)
+                .pendingAppointments(pending)
+                .confirmedAppointments(confirmed)
+                .completedAppointments(completed)
+                .build();
+    }
+
     private AppointmentResponse mapToResponse(Appointment appointment) {
         return AppointmentResponse.builder()
                 .id(appointment.getId())
@@ -216,4 +258,3 @@ public class AppointmentService {
                 .build();
     }
 }
-

@@ -189,13 +189,15 @@ const PatientDashboard: React.FC = () => {
         </Col>
         <Col xs={24} sm={12} md={8}>
           <Card>
-            <Statistic
-              title="Quick Access"
-              value="Book Now"
-              prefix={<MedicineBoxOutlined />}
-              valueStyle={{ color: "#1890ff", cursor: "pointer" }}
-              onClick={() => navigate("/book-appointment")}
-            />
+            <Button type="link" onClick={() => navigate("/book-appointment")}
+              style={{ padding: 0, height: "auto" }}>
+              <Statistic
+                title="Quick Access"
+                value="Book Now"
+                prefix={<MedicineBoxOutlined />}
+                valueStyle={{ color: "#1890ff" }}
+              />
+            </Button>
           </Card>
         </Col>
       </Row>
@@ -256,4 +258,3 @@ const PatientDashboard: React.FC = () => {
 };
 
 export default PatientDashboard;
-

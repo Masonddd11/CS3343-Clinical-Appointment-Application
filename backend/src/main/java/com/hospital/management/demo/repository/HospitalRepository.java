@@ -14,5 +14,5 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
     List<Hospital> findByOperationalStatusNot(OperationalStatus status);
     List<Hospital> findByDistrict(String district);
     Optional<Hospital> findByName(String name);
+    long count();
 }
-

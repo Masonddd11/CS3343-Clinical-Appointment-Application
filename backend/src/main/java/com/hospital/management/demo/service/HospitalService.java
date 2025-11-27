@@ -30,6 +30,7 @@ public class HospitalService {
                 .currentIntensity(request.getCurrentIntensity() != null ? request.getCurrentIntensity() : 0.0)
                 .operationalStatus(request.getOperationalStatus() != null ? request.getOperationalStatus() : OperationalStatus.OPERATIONAL)
                 .closureReason(request.getClosureReason())
+                .hasAccidentAndEmergency(Boolean.TRUE.equals(request.getHasAccidentAndEmergency()))
                 .build();
 
         hospital = hospitalRepository.save(hospital);
@@ -62,6 +63,7 @@ public class HospitalService {
         if (request.getCurrentIntensity() != null) hospital.setCurrentIntensity(request.getCurrentIntensity());
         if (request.getOperationalStatus() != null) hospital.setOperationalStatus(request.getOperationalStatus());
         if (request.getClosureReason() != null) hospital.setClosureReason(request.getClosureReason());
+        hospital.setHasAccidentAndEmergency(Boolean.TRUE.equals(request.getHasAccidentAndEmergency()));
 
         hospital = hospitalRepository.save(hospital);
         return mapToResponse(hospital);
@@ -79,7 +81,7 @@ public class HospitalService {
                 .currentIntensity(hospital.getCurrentIntensity())
                 .operationalStatus(hospital.getOperationalStatus())
                 .closureReason(hospital.getClosureReason())
+                .hasAccidentAndEmergency(hospital.getHasAccidentAndEmergency())
                 .build();
     }
 }
-

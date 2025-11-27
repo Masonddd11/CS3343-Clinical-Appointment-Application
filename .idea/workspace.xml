@@ -4,16 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="62eb56fd-1a94-492e-ac7e-4ac765a01ac0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/api/adminApi.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/api/pathfindingApi.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/api/symptomApi.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/AdminDoctorsPage.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/AdminHospitalsPage.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/AdminUsersPage.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/BookAppointmentPage.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/DoctorDashboard.tsx" afterDir="false" />
+    <list default="true" id="62eb56fd-1a94-492e-ac7e-4ac765a01ac0" name="Changes" comment="Frontend upload by Tommy">
+      <change afterPath="$PROJECT_DIR$/backend/data/hospitaldb.mv.db" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/data/hospitaldb.trace.db" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/config/RestClientConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/dto/DashboardSummaryResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/dto/UpdateAppointmentStatusRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/dto/seed/HospitalSeedDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/integration/ae/AeIntensityCalculator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/integration/ae/AeWaitingTimeClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/integration/ae/AeWaitingTimeEntry.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/integration/ae/AeWaitingTimeResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/integration/district/DistrictMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/scheduler/AeIntensityScheduler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/resources/a&amp;e_waiting_time.Json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/resources/data.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/resources/district-mapping.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/resources/hospital.Json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/test/java/com/hospital/management/demo/integration/ae/AeIntensityCalculatorTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/AdminAppointmentsPage.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/utils/districtRegion.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/.gitattributes" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gitattributes" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gitignore" afterDir="false" />
@@ -89,47 +99,17 @@
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/hospital/management/demo/service/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/hospital/management/demo/DemoApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/hospital/management/demo/DemoApplicationTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/eslint.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/eslint.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/frontend/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/frontend/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/frontend/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/frontend/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/postcss.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/postcss.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/apiClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/apiClient.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/adminApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/adminApi.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/api/appointmentApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/appointmentApi.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/authApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/authApi.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/departmentApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/departmentApi.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/doctorApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/doctorApi.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/hospitalApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/hospitalApi.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/AppointmentList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/AppointmentList.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/Layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/context/AuthContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/context/AuthContext.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/context/AuthContextTypes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/context/AuthContextTypes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/hooks/useAuth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/hooks/useAuth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/AdminDashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/AdminDashboard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LoginPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LoginPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/AdminDoctorsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/AdminDoctorsPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/AdminHospitalsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/AdminHospitalsPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/BookAppointmentPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/BookAppointmentPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/PatientDashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PatientDashboard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/RegisterPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/RegisterPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/types/appointment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/types/appointment.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/types/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/types/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/types/department.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/types/department.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/types/doctor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/types/doctor.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/types/hospital.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/types/hospital.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/utils/storage.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/storage.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tailwind.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.app.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.node.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.node.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -145,12 +125,12 @@
     &quot;assignee&quot;: &quot;Masonddd11&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Masonddd11/CS3343-Clinical-Appointment-Application&quot;,
-    &quot;accountId&quot;: &quot;65e4a34c-c6ad-4357-8ee1-99fb2ec35385&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Masonddd11/CS3343-Clinical-Appointment-Application.git",
+    "accountId": "0eb4f908-3fa5-47b3-9141-4093b8a21b1b"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -159,27 +139,45 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;new-impl&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/kayui/Downloads/cs3343-development/cs3343-development&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "new-impl",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/kayui/CS3343-Clinical-Appointment-Application/backend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\kayui\CS3343-Clinical-Appointment-Application\backend" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="CS3343-Clinical-Appointment-Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="CS3343-Clinical-Appointment-Application" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="62eb56fd-1a94-492e-ac7e-4ac765a01ac0" name="Changes" comment="" />
@@ -189,10 +187,23 @@
       <updated>1763781399433</updated>
       <workItem from="1763781400694" duration="2407000" />
     </task>
+    <task id="LOCAL-00001" summary="Frontend upload by Tommy">
+      <option name="closed" value="true" />
+      <created>1764172326623</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1764172326623</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Frontend upload by Tommy" />
+    <option name="LAST_COMMIT_MESSAGE" value="Frontend upload by Tommy" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

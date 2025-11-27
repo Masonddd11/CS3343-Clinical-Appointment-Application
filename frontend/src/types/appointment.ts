@@ -29,7 +29,7 @@ export interface AppointmentRequest {
   departmentId: number;
   appointmentDate: string;
   appointmentTime: string;
-  reason?: string;
+  reasonForVisit: string;
   symptoms?: string;
 }
 

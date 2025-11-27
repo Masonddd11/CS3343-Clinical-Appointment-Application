@@ -23,5 +23,5 @@ public class HospitalRequest {
     private Double currentIntensity;
     private OperationalStatus operationalStatus;
     private String closureReason;
+    private Boolean hasAccidentAndEmergency;
 }
-

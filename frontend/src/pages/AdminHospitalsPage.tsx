@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Card,
   Table,
@@ -11,11 +11,13 @@ import {
   message,
   Tag,
   Space,
+  Switch,
 } from "antd";
 import { PlusOutlined, EditOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { hospitalApi } from "../api/hospitalApi";
 import type { HospitalResponse, HospitalRequest } from "../types/hospital";
+import { getRegionForHospital, REGION_LABELS, type RegionCode } from "../utils/districtRegion";
 
 const { Option } = Select;
 
@@ -24,6 +26,8 @@ const AdminHospitalsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingHospital, setEditingHospital] = useState<HospitalResponse | null>(null);
+  const [regionFilter, setRegionFilter] = useState<RegionCode | undefined>();
+  const [aeFilter, setAeFilter] = useState<boolean | undefined>();
   const [form] = Form.useForm();
 
   const fetchHospitals = async () => {
@@ -78,6 +82,14 @@ const AdminHospitalsPage: React.FC = () => {
     return colors[status] || "default";
   };
 
+  const filteredHospitals = useMemo(() => {
+    return hospitals.filter((hospital) => {
+      const regionMatch = regionFilter ? getRegionForHospital(hospital.district, hospital.name) === regionFilter : true;
+      const aeMatch = aeFilter === undefined ? true : hospital.hasAccidentAndEmergency === aeFilter;
+      return regionMatch && aeMatch;
+    });
+  }, [hospitals, regionFilter, aeFilter]);
+
   const columns: ColumnsType<HospitalResponse> = [
     {
       title: "Name",
@@ -113,6 +125,17 @@ const AdminHospitalsPage: React.FC = () => {
       render: (status: string) => (
         <Tag color={getStatusColor(status)}>{status}</Tag>
       ),
+    },
+    {
+      title: "A&E",
+      dataIndex: "hasAccidentAndEmergency",
+      key: "hasAccidentAndEmergency",
+      render: (value: boolean) => <Tag color={value ? "green" : "red"}>{value ? "Yes" : "No"}</Tag>,
+    },
+    {
+      title: "Region",
+      key: "region",
+      render: (_, record) => REGION_LABELS[getRegionForHospital(record.district, record.name)],
     },
     {
       title: "Actions",
@@ -165,9 +188,33 @@ const AdminHospitalsPage: React.FC = () => {
       </div>
 
       <Card>
+        <Space wrap>
+          <Select
+            allowClear
+            placeholder="Filter by region"
+            style={{ width: 220 }}
+            value={regionFilter}
+            onChange={(value) => setRegionFilter(value)}
+            options={Object.entries(REGION_LABELS).map(([value, label]) => ({
+              label,
+              value,
+            }))}
+          />
+          <Select
+            allowClear
+            placeholder="Has A&E"
+            style={{ width: 160 }}
+            value={aeFilter === undefined ? undefined : aeFilter ? "yes" : "no"}
+            onChange={(value) => setAeFilter(value === undefined ? undefined : value === "yes")}
+            options={[
+              { label: "Has A&E", value: "yes" },
+              { label: "No A&E", value: "no" },
+            ]}
+          />
+        </Space>
         <Table
           columns={columns}
-          dataSource={hospitals}
+          dataSource={filteredHospitals}
           rowKey="id"
           loading={loading}
           pagination={{ pageSize: 10 }}
@@ -208,6 +255,20 @@ const AdminHospitalsPage: React.FC = () => {
             rules={[{ required: true, message: "Please enter district" }]}
           >
             <Input placeholder="Central" />
+          </Form.Item>
+
+          <Form.Item
+            name="region"
+            label="Region"
+            rules={[{ required: true, message: "Please select region" }]}
+          >
+            <Select placeholder="Select region">
+              {Object.entries(REGION_LABELS).map(([value, label]) => (
+                <Option key={value} value={value}>
+                  {label}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Space style={{ width: "100%" }} size="large">
@@ -262,6 +323,14 @@ const AdminHospitalsPage: React.FC = () => {
               <Option value="LIMITED">Limited Service</Option>
               <Option value="CLOSED">Closed</Option>
             </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="hasAccidentAndEmergency"
+            label="Accident & Emergency"
+            valuePropName="checked"
+          >
+            <Switch />
           </Form.Item>
 
           <Form.Item name="closureReason" label="Closure Reason (if applicable)">

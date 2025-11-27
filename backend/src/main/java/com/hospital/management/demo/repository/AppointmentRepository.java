@@ -19,5 +19,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByDoctorIdAndStatus(Long doctorId, AppointmentStatus status);
     boolean existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndStatusNot(
             Long doctorId, LocalDate appointmentDate, LocalTime appointmentTime, AppointmentStatus status);
+    long countByStatus(AppointmentStatus status);
+    long count();
 }
-

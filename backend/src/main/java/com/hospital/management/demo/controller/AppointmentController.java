@@ -3,8 +3,10 @@ package com.hospital.management.demo.controller;
 import com.hospital.management.demo.dto.AppointmentRequest;
 import com.hospital.management.demo.dto.AppointmentResponse;
 import com.hospital.management.demo.dto.RescheduleAppointmentRequest;
+import com.hospital.management.demo.dto.UpdateAppointmentStatusRequest;
 import com.hospital.management.demo.model.entity.Patient;
 import com.hospital.management.demo.model.entity.User;
+import com.hospital.management.demo.model.enums.AppointmentStatus;
 import com.hospital.management.demo.model.enums.UserRole;
 import com.hospital.management.demo.repository.DoctorRepository;
 import com.hospital.management.demo.repository.PatientRepository;
@@ -46,6 +48,20 @@ public class AppointmentController {
         }
         
         return ResponseEntity.ok(appointmentService.bookAppointment(patient.getId(), request));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AppointmentResponse>> getAllAppointments() {
+        return ResponseEntity.ok(appointmentService.getAllAppointments());
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AppointmentResponse> updateStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateAppointmentStatusRequest request) {
+        return ResponseEntity.ok(appointmentService.updateAppointmentStatus(id, request.getStatus()));
     }
 
     @GetMapping("/patient")
@@ -101,4 +117,3 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.markAppointmentCompleted(id, doctor.getId()));
     }
 }
-

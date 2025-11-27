@@ -1,5 +1,9 @@
 package com.hospital.management.demo.config;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hospital.management.demo.dto.seed.HospitalSeedDto;
+import com.hospital.management.demo.integration.district.DistrictMapper;
 import com.hospital.management.demo.model.entity.Appointment;
 import com.hospital.management.demo.model.entity.Department;
 import com.hospital.management.demo.model.entity.Doctor;
@@ -20,13 +24,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -42,6 +52,48 @@ public class DataInitializer implements CommandLineRunner {
     private final PatientRepository patientRepository;
     private final SymptomRepository symptomRepository;
     private final AppointmentRepository appointmentRepository;
+    private final ObjectMapper objectMapper;
+    private final DistrictMapper districtMapper;
+
+    private static final String HOSPITAL_SEED_FILE = "hospital.Json";
+    private static final double AE_INTENSITY = 0.45;
+    private static final double NON_AE_INTENSITY = 0.25;
+    private static final int AE_CAPACITY = 1200;
+    private static final int NON_AE_CAPACITY = 600;
+
+    private static final List<DepartmentSeed> DEPARTMENT_SEEDS = List.of(
+            new DepartmentSeed("Cardiology", "CAR", "Heart related care"),
+            new DepartmentSeed("Urology", "URO", "Kidney and urinary system treatment"),
+            new DepartmentSeed("Neurology", "NEU", "Brain and nervous system disorders"),
+            new DepartmentSeed("Orthopedics", "ORT", "Bone and joint injuries"),
+            new DepartmentSeed("Dermatology", "DER", "Skin, hair, and nail conditions"),
+            new DepartmentSeed("Gastroenterology", "GAS", "Digestive system issues"),
+            new DepartmentSeed("Ophthalmology", "OPH", "Eye and vision care"),
+            new DepartmentSeed("Otolaryngology", "ENT", "Ear, nose, and throat treatment"),
+            new DepartmentSeed("Pulmonology", "PUL", "Lung and respiratory care"),
+            new DepartmentSeed("Endocrinology", "END", "Hormone and metabolic disorders")
+    );
+
+    private static final List<DoctorSeed> DOCTOR_SEEDS = List.of(
+            new DoctorSeed("doctor@hospital.com", "doctor123", "Alice", "Wong", "12345678", "Urology", "MBBS, FRCS", "Specialist in kidney care", "Queen Elizabeth Hospital", "URO"),
+            new DoctorSeed("cardio@hospital.com", "doctor123", "Ben", "Lee", "87654321", "Cardiology", "MBBS, MRCP", "Experienced cardiologist", "Queen Elizabeth Hospital", "CAR"),
+            new DoctorSeed("neuro@hospital.com", "doctor123", "Carol", "Ho", "61234567", "Neurology", "MBBS, FRCP", "Brain and nervous system specialist", "Queen Elizabeth Hospital", "NEU"),
+            new DoctorSeed("ortho@hospital.com", "doctor123", "David", "Lam", "69876543", "Orthopedics", "MBBS, FRCS(Ortho)", "Bone and joint surgeon", "Princess Margaret Hospital", "ORT"),
+            new DoctorSeed("derma@hospital.com", "doctor123", "Eva", "Ng", "93456781", "Dermatology", "MBBS, MRCP(Derm)", "Skin specialist", "Queen Elizabeth Hospital", "DER")
+    );
+
+    private static final List<SymptomSeed> SYMPTOM_SEEDS = List.of(
+            new SymptomSeed("kidney pain", "URO", 1, List.of("renal pain", "flank pain", "kidney discomfort", "urinary pain")),
+            new SymptomSeed("heart pain", "CAR", 1, List.of("chest pain", "cardiac pain", "chest tightness", "palpitations")),
+            new SymptomSeed("migraine", "NEU", 2, List.of("headache", "throbbing head", "light sensitivity", "aura")),
+            new SymptomSeed("back injury", "ORT", 2, List.of("fracture", "sprain", "joint pain", "bone pain")),
+            new SymptomSeed("skin rash", "DER", 2, List.of("itchy skin", "red patches", "eczema", "dermatitis")),
+            new SymptomSeed("stomach ache", "GAS", 2, List.of("abdominal pain", "bloating", "acid reflux", "indigestion")),
+            new SymptomSeed("blurred vision", "OPH", 2, List.of("vision loss", "eye pain", "double vision", "dry eyes")),
+            new SymptomSeed("sore throat", "ENT", 3, List.of("ear pain", "blocked nose", "sinus", "hoarseness")),
+            new SymptomSeed("shortness of breath", "PUL", 1, List.of("wheezing", "cough", "respiratory distress", "asthma")),
+            new SymptomSeed("excessive thirst", "END", 2, List.of("fatigue", "weight change", "blood sugar", "hormone"))
+    );
 
     @Value("${admin.default.email:admin@hospital.com}")
     private String defaultAdminEmail;
@@ -78,58 +130,42 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initializeDemoData() {
-        Hospital queenElizabeth = createHospitalIfNotExists(
-                "Queen Elizabeth Hospital",
-                "30 Gascoigne Rd, Jordan",
-                22.3071,
-                114.1722,
-                "Kowloon",
-                2000,
-                0.4
-        );
+        List<HospitalSeedDto> hospitalSeedData = loadHospitalSeedData();
+        if (hospitalSeedData.isEmpty()) {
+            log.error("Hospital seed data not available. Skipping hospital initialization.");
+            return;
+        }
 
-        Hospital princessMargaret = createHospitalIfNotExists(
-                "Princess Margaret Hospital",
-                "2-10 Princess Margaret Hospital Rd, Lai Chi Kok",
-                22.3345,
-                114.1373,
-                "Kowloon",
-                1500,
-                0.6
-        );
+        hospitalSeedData.forEach(this::upsertHospitalFromSeed);
+        log.info("Hospital dataset synchronized from {} entries.", hospitalSeedData.size());
 
-        Department urology = createDepartmentIfNotExists("Urology", "URO", "Kidney and urinary system treatment");
-        Department cardiology = createDepartmentIfNotExists("Cardiology", "CAR", "Heart related care");
+        Map<String, Department> departmentByCode = DEPARTMENT_SEEDS.stream()
+                .collect(Collectors.toMap(DepartmentSeed::code, seed -> createDepartmentIfNotExists(seed.name(), seed.code(), seed.description())));
 
-        assignDepartmentToHospital(queenElizabeth, urology);
-        assignDepartmentToHospital(queenElizabeth, cardiology);
-        assignDepartmentToHospital(princessMargaret, urology);
+        Hospital queenElizabeth = findHospitalByNameOrThrow("Queen Elizabeth Hospital");
+        Hospital princessMargaret = findHospitalByNameOrThrow("Princess Margaret Hospital");
 
-        Doctor doctorWong = createDoctorIfNotExists(
-                "doctor@hospital.com",
-                "doctor123",
-                "Alice",
-                "Wong",
-                "12345678",
-                "Urology",
-                "MBBS, FRCS",
-                "Specialist in kidney care",
-                queenElizabeth,
-                urology
-        );
+        assignDefaultDepartments(List.of(queenElizabeth, princessMargaret), departmentByCode);
 
-        createDoctorIfNotExists(
-                "cardio@hospital.com",
-                "doctor123",
-                "Ben",
-                "Lee",
-                "87654321",
-                "Cardiology",
-                "MBBS, MRCP",
-                "Experienced cardiologist",
-                queenElizabeth,
-                cardiology
-        );
+        List<Doctor> seededDoctors = DOCTOR_SEEDS.stream()
+                .map(seed -> createDoctorIfNotExists(
+                        seed.email(),
+                        seed.password(),
+                        seed.firstName(),
+                        seed.lastName(),
+                        seed.phone(),
+                        seed.specialization(),
+                        seed.qualifications(),
+                        seed.bio(),
+                        findHospitalByNameOrThrow(seed.hospitalName()),
+                        departmentByCode.get(seed.departmentCode())
+                ))
+                .toList();
+
+        Doctor doctorWong = seededDoctors.stream()
+                .filter(doc -> doc.getUser().getEmail().equals("doctor@hospital.com"))
+                .findFirst()
+                .orElseThrow();
 
         Patient patientChan = createPatientIfNotExists(
                 "patient@test.com",
@@ -142,37 +178,62 @@ public class DataInitializer implements CommandLineRunner {
                 114.17
         );
 
-        createSymptomIfNotExists("kidney pain", urology, 1, List.of("renal pain", "flank pain", "kidney discomfort"));
-        createSymptomIfNotExists("heart pain", cardiology, 1, List.of("chest pain", "cardiac pain", "chest tightness"));
+        SYMPTOM_SEEDS.forEach(seed -> createSymptomIfNotExists(
+                seed.name(),
+                departmentByCode.get(seed.departmentCode()),
+                seed.priority(),
+                seed.keywords()
+        ));
 
-        createSampleAppointmentIfAbsent(patientChan, doctorWong, queenElizabeth, urology);
+        createSampleAppointmentIfAbsent(patientChan, doctorWong, queenElizabeth, departmentByCode.get("URO"));
     }
 
-    private Hospital createHospitalIfNotExists(String name,
-                                               String address,
-                                               double latitude,
-                                               double longitude,
-                                               String district,
-                                               int capacity,
-                                               double intensity) {
-        Optional<Hospital> existing = hospitalRepository.findByName(name);
-        if (existing.isPresent()) {
-            return existing.get();
+    private List<HospitalSeedDto> loadHospitalSeedData() {
+        ClassPathResource resource = new ClassPathResource(HOSPITAL_SEED_FILE);
+        if (!resource.exists()) {
+            log.error("Hospital seed file {} not found on classpath.", HOSPITAL_SEED_FILE);
+            return Collections.emptyList();
+        }
+        try (InputStream inputStream = resource.getInputStream()) {
+            return objectMapper.readValue(inputStream, new TypeReference<>() {});
+        } catch (IOException ex) {
+            log.error("Failed to parse hospital seed JSON.", ex);
+            return Collections.emptyList();
+        }
+    }
+
+    private void upsertHospitalFromSeed(HospitalSeedDto seed) {
+        if (seed == null || seed.institutionEng() == null) {
+            log.warn("Encountered hospital seed entry with missing institution name. Skipping entry: {}", seed);
+            return;
+        }
+        if (seed.latitude() == null || seed.longitude() == null) {
+            log.warn("Hospital entry {} missing coordinates. Skipping.", seed.institutionEng());
+            return;
         }
 
-        Hospital hospital = Hospital.builder()
-                .name(name)
-                .address(address)
-                .latitude(latitude)
-                .longitude(longitude)
-                .district(district)
-                .capacity(capacity)
-                .currentIntensity(intensity)
-                .build();
+        Hospital hospital = hospitalRepository.findByName(seed.institutionEng())
+                .orElseGet(() -> Hospital.builder().name(seed.institutionEng()).build());
 
-        hospital = hospitalRepository.save(hospital);
-        log.info("Created demo hospital: {}", name);
-        return hospital;
+        hospital.setAddress(seed.addressEng());
+        hospital.setLatitude(seed.latitude());
+        hospital.setLongitude(seed.longitude());
+        hospital.setDistrict(districtMapper.map(seed.institutionEng(), seed.clusterEng()));
+        hospital.setCapacity(determineCapacity(seed));
+        hospital.setCurrentIntensity(seed.hasAccidentAndEmergency() ? AE_INTENSITY : NON_AE_INTENSITY);
+        hospital.setHasAccidentAndEmergency(seed.hasAccidentAndEmergency());
+
+        hospitalRepository.save(hospital);
+        log.debug("Upserted hospital entry: {}", seed.institutionEng());
+    }
+
+    private int determineCapacity(HospitalSeedDto seed) {
+        return seed.hasAccidentAndEmergency() ? AE_CAPACITY : NON_AE_CAPACITY;
+    }
+
+    private Hospital findHospitalByNameOrThrow(String name) {
+        return hospitalRepository.findByName(name)
+                .orElseThrow(() -> new IllegalStateException("Required hospital not found in seed data: " + name));
     }
 
     private Department createDepartmentIfNotExists(String name, String code, String description) {
@@ -338,5 +399,19 @@ public class DataInitializer implements CommandLineRunner {
         appointmentRepository.save(appointment);
         log.info("Created demo appointment on {} at {}", appointmentDate, appointmentTime);
     }
-}
 
+    private void assignDefaultDepartments(List<Hospital> hospitals, Map<String, Department> departments) {
+        hospitals.forEach(hospital -> departments.values().forEach(dept -> {
+            if ((hospital.getName().contains("Queen") && !List.of("ENT", "PUL", "END").contains(dept.getCode())) ||
+                (hospital.getName().contains("Princess") && List.of("URO", "ORT", "DER", "OPH").contains(dept.getCode()))) {
+                assignDepartmentToHospital(hospital, dept);
+            }
+        }));
+    }
+
+    private record DepartmentSeed(String name, String code, String description) {}
+    private record DoctorSeed(String email, String password, String firstName, String lastName, String phone,
+                              String specialization, String qualifications, String bio,
+                              String hospitalName, String departmentCode) {}
+    private record SymptomSeed(String name, String departmentCode, int priority, List<String> keywords) {}
+}

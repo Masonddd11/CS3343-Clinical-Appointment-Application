@@ -13,6 +13,7 @@ import BookAppointmentPage from "./pages/BookAppointmentPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminHospitalsPage from "./pages/AdminHospitalsPage";
 import AdminDoctorsPage from "./pages/AdminDoctorsPage";
+import AdminAppointmentsPage from "./pages/AdminAppointmentsPage";
 import "./App.css";
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -94,6 +95,16 @@ const AppRoutes: React.FC = () => {
           <PrivateRoute>
             <Layout>
               <AdminDoctorsPage />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin/appointments"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <AdminAppointmentsPage />
             </Layout>
           </PrivateRoute>
         }

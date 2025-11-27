@@ -62,6 +62,10 @@ public class Hospital {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "has_ae")
+    @Builder.Default
+    private Boolean hasAccidentAndEmergency = false;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -73,4 +77,3 @@ public class Hospital {
         updatedAt = LocalDateTime.now();
     }
 }
-

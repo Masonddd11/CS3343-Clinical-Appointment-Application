@@ -7,6 +7,18 @@ export interface UserInfo {
   role: "PATIENT" | "DOCTOR" | "ADMIN";
 }
 
+export interface DashboardSummaryResponse {
+  totalUsers: number;
+  totalPatients: number;
+  totalDoctors: number;
+  totalHospitals: number;
+  totalDepartments: number;
+  totalAppointments: number;
+  pendingAppointments: number;
+  confirmedAppointments: number;
+  completedAppointments: number;
+}
+
 export const adminApi = {
   createUser: async (data: RegisterRequest): Promise<UserInfo> => {
     const response = await apiClient.post<UserInfo>("/admin/users", data);
@@ -30,6 +42,11 @@ export const adminApi = {
 
   createDepartment: async (data: any): Promise<any> => {
     const response = await apiClient.post("/admin/departments", data);
+    return response.data;
+  },
+
+  getDashboardSummary: async (): Promise<DashboardSummaryResponse> => {
+    const response = await apiClient.get<DashboardSummaryResponse>("/admin/dashboard");
     return response.data;
   },
 };

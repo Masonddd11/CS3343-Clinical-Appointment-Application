@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +26,8 @@ public class SymptomService {
 
     private final SymptomRepository symptomRepository;
     private final DepartmentRepository departmentRepository;
+
+    private static final double MIN_CONFIDENCE = 0.25;
 
     @Transactional
     public Symptom createSymptom(String symptom, Long departmentId, Integer priority, List<String> keywords) {
@@ -44,6 +47,9 @@ public class SymptomService {
     public Optional<SymptomMatchResult> analyzeSymptom(String symptomText) {
         String normalizedInput = normalizeSymptom(symptomText);
         List<String> inputTokens = tokenize(normalizedInput);
+        if (inputTokens.isEmpty()) {
+            return Optional.empty();
+        }
 
         List<Symptom> allSymptoms = symptomRepository.findAll();
         Symptom bestSymptom = null;
@@ -52,7 +58,11 @@ public class SymptomService {
 
         for (Symptom symptom : allSymptoms) {
             SymptomScore score = computeScore(inputTokens, symptom);
-            double adjustedScore = score.getScore() - (symptom.getPriority() * 0.05);
+            if (score.getScore() <= 0) {
+                continue;
+            }
+            double priorityBoost = 1.0 / ((symptom.getPriority() != null ? symptom.getPriority() : 1) + 1.0);
+            double adjustedScore = (score.getScore() * 0.7) + (score.getKeywordCoverage() * 0.2) + (priorityBoost * 0.1);
             if (adjustedScore > bestScore) {
                 bestScore = adjustedScore;
                 bestSymptom = symptom;
@@ -60,7 +70,7 @@ public class SymptomService {
             }
         }
 
-        if (bestSymptom == null || bestScore <= 0) {
+        if (bestSymptom == null || bestScore < MIN_CONFIDENCE) {
             return Optional.empty();
         }
 
@@ -110,11 +120,21 @@ public class SymptomService {
 
     private SymptomScore computeScore(List<String> inputTokens, Symptom symptom) {
         if (inputTokens.isEmpty()) {
-            return new SymptomScore(0, Set.of());
+            return SymptomScore.builder()
+                    .score(0)
+                    .keywordCoverage(0)
+                    .matchedKeywords(Collections.emptySet())
+                    .build();
         }
 
-        Set<String> symptomTokens = new HashSet<>(tokenize(symptom.getSymptom()));
-        symptomTokens.addAll(symptom.getKeywords());
+        Set<String> symptomTokens = buildTokenSet(symptom);
+        if (symptomTokens.isEmpty()) {
+            return SymptomScore.builder()
+                    .score(0)
+                    .keywordCoverage(0)
+                    .matchedKeywords(Collections.emptySet())
+                    .build();
+        }
 
         double matches = 0;
         Set<String> matched = new HashSet<>();
@@ -130,7 +150,23 @@ public class SymptomService {
         }
 
         double score = matches / inputTokens.size();
-        return new SymptomScore(score, matched);
+        double coverage = (double) matched.size() / symptomTokens.size();
+        return SymptomScore.builder()
+                .score(score)
+                .keywordCoverage(coverage)
+                .matchedKeywords(matched)
+                .build();
+    }
+
+    private Set<String> buildTokenSet(Symptom symptom) {
+        Set<String> symptomTokens = new HashSet<>(tokenize(symptom.getSymptom()));
+        if (symptom.getKeywords() != null) {
+            symptom.getKeywords().stream()
+                    .map(this::normalizeSymptom)
+                    .map(this::tokenize)
+                    .forEach(tokenList -> symptomTokens.addAll(tokenList));
+        }
+        return symptomTokens;
     }
 
     @Data
@@ -145,7 +181,7 @@ public class SymptomService {
     @Builder
     private static class SymptomScore {
         private final double score;
+        private final double keywordCoverage;
         private final Set<String> matchedKeywords;
     }
 }
-

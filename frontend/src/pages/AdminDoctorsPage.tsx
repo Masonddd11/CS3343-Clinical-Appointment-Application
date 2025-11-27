@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Card,
   Table,
@@ -29,6 +29,7 @@ const AdminDoctorsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [hospitalFilter, setHospitalFilter] = useState<number | undefined>();
 
   const fetchData = async () => {
     try {
@@ -66,6 +67,13 @@ const AdminDoctorsPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const filteredDoctors = useMemo(() => {
+    if (!hospitalFilter) {
+      return doctors;
+    }
+    return doctors.filter((doctor) => doctor.hospitalId === hospitalFilter);
+  }, [doctors, hospitalFilter]);
 
   const columns: ColumnsType<DoctorResponse> = [
     {
@@ -141,10 +149,24 @@ const AdminDoctorsPage: React.FC = () => {
         </Button>
       </div>
 
+      <Space style={{ marginBottom: 16 }} wrap>
+        <Select
+          allowClear
+          placeholder="Filter by hospital"
+          style={{ width: 240 }}
+          value={hospitalFilter}
+          onChange={(value) => setHospitalFilter(value)}
+          options={hospitals.map((hospital) => ({
+            label: hospital.name,
+            value: hospital.id,
+          }))}
+        />
+      </Space>
+
       <Card>
         <Table
           columns={columns}
-          dataSource={doctors}
+          dataSource={filteredDoctors}
           rowKey="id"
           loading={loading}
           pagination={{ pageSize: 10 }}

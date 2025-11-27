@@ -44,6 +44,7 @@ const BookAppointmentPage: React.FC = () => {
 
   // Step 1: Symptom Analysis
   const [symptomResult, setSymptomResult] = useState<SymptomAnalysisResponse | null>(null);
+  const [symptomError, setSymptomError] = useState<string | null>(null);
 
   // Step 2: Hospital Selection
   const [recommendedHospitals, setRecommendedHospitals] = useState<HospitalRecommendationResponse[]>([]);
@@ -86,6 +87,7 @@ const BookAppointmentPage: React.FC = () => {
       setLoading(true);
       const result = await symptomApi.analyzeSymptom({ symptom: values.symptoms });
       setSymptomResult(result);
+      setSymptomError(null);
 
       if (result.departmentId) {
         // Get recommended hospitals
@@ -100,10 +102,13 @@ const BookAppointmentPage: React.FC = () => {
         setSelectedDepartment(result.departmentId);
         setCurrentStep(1);
       } else {
+        setSymptomError("Could not determine department automatically. Please pick one manually.");
         message.warning("Could not determine department. Please select manually.");
       }
     } catch (error: any) {
-      message.error(error.response?.data?.message || "Failed to analyze symptoms");
+      const errMsg = error.response?.data?.message || "Failed to analyze symptoms";
+      setSymptomError(errMsg);
+      message.error(errMsg);
     } finally {
       setLoading(false);
     }
@@ -170,14 +175,21 @@ const BookAppointmentPage: React.FC = () => {
         departmentId: selectedDepartment,
         appointmentDate: selectedDate.format("YYYY-MM-DD"),
         appointmentTime: selectedTime.format("HH:mm"),
-        reason: values.reasonForVisit || "General consultation",
+        reasonForVisit: values.reasonForVisit || "General consultation",
         symptoms: values.symptoms || "",
       });
 
       message.success("Appointment booked successfully!");
       navigate("/dashboard");
     } catch (error: any) {
-      message.error(error.response?.data?.message || "Failed to book appointment");
+      const backendMessage = error.response?.data?.message;
+      if (backendMessage?.toLowerCase().includes("24 hours")) {
+        message.error("Bookings must be at least 24h ahead. Please pick a later slot.");
+      } else if (backendMessage?.toLowerCase().includes("3 months")) {
+        message.error("Bookings are limited to within the next 3 months.");
+      } else {
+        message.error(backendMessage || "Failed to book appointment");
+      }
     } finally {
       setLoading(false);
     }
@@ -249,6 +261,9 @@ const BookAppointmentPage: React.FC = () => {
                   type="success"
                   showIcon
                 />
+              )}
+              {symptomError && (
+                <Alert message={symptomError} type="warning" showIcon />
               )}
               <h3 className="text-lg font-semibold">Recommended Hospitals</h3>
               <List
