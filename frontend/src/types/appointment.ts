@@ -21,6 +21,8 @@ export interface AppointmentResponse {
   status: AppointmentStatus;
   pathfindingScore?: number;
   notes?: string;
+  patientLatitude?: number;
+  patientLongitude?: number;
 }
 
 export interface AppointmentRequest {
@@ -31,6 +33,8 @@ export interface AppointmentRequest {
   appointmentTime: string;
   reasonForVisit: string;
   symptoms?: string;
+  patientLatitude?: number;
+  patientLongitude?: number;
 }
 
 export interface RescheduleAppointmentRequest {

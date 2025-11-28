@@ -60,29 +60,48 @@ const BookAppointmentPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedTime, setSelectedTime] = useState<Dayjs | null>(null);
 
-  // Get user's location
-  const getUserLocation = (): Promise<{ latitude: number; longitude: number }> => {
-    return new Promise((resolve) => {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            resolve({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            });
-          },
-          () => {
-            // Default to Hong Kong coordinates if denied
-            resolve({ latitude: 22.3193, longitude: 114.1694 });
-          }
-        );
-      } else {
-        resolve({ latitude: 22.3193, longitude: 114.1694 });
+  // Location state
+  const [useDeviceLocation, setUseDeviceLocation] = useState(false);
+  const [manualLocation, setManualLocation] = useState<{ latitude?: number; longitude?: number }>({});
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const isLocationReady =
+    typeof manualLocation.latitude === "number" && !Number.isNaN(manualLocation.latitude) &&
+    typeof manualLocation.longitude === "number" && !Number.isNaN(manualLocation.longitude);
+
+  const getUserLocation = async (): Promise<{ latitude: number; longitude: number }> => {
+    if (isLocationReady) {
+      return { latitude: manualLocation.latitude!, longitude: manualLocation.longitude! };
+    }
+    throw new Error("Please provide your location before continuing.");
+  };
+
+  // New: try to fetch and set device location into manualLocation
+  const handleUseMyLocation = () => {
+    setLocationError(null);
+    if (!("geolocation" in navigator)) {
+      setLocationError("Geolocation is not supported by your browser");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setManualLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude });
+        setUseDeviceLocation(true);
+      },
+      () => {
+        setLocationError("Failed to retrieve your location. Please enter it manually.");
+        setUseDeviceLocation(false);
       }
-    });
+    );
   };
 
   const handleSymptomAnalysis = async (values: { symptoms: string }) => {
+    if (!isLocationReady) {
+      setLocationError("Please provide your location (device or manual) before analyzing symptoms.");
+      message.error("Location is required to recommend hospitals.");
+      return;
+    }
+
     try {
       setLoading(true);
       const result = await symptomApi.analyzeSymptom({ symptom: values.symptoms });
@@ -166,6 +185,12 @@ const BookAppointmentPage: React.FC = () => {
       return;
     }
 
+    // Validate location presence
+    if (!manualLocation.latitude || !manualLocation.longitude) {
+      message.error("Please provide your location (use device or enter manually)");
+      return;
+    }
+
     try {
       setLoading(true);
       const values = form.getFieldsValue();
@@ -177,6 +202,8 @@ const BookAppointmentPage: React.FC = () => {
         appointmentTime: selectedTime.format("HH:mm"),
         reasonForVisit: values.reasonForVisit || "General consultation",
         symptoms: values.symptoms || "",
+        patientLatitude: manualLocation.latitude,
+        patientLongitude: manualLocation.longitude,
       });
 
       message.success("Appointment booked successfully!");
@@ -226,25 +253,68 @@ const BookAppointmentPage: React.FC = () => {
           {currentStep === 0 && (
             <div className="space-y-4">
               <Alert
-                message="Describe Your Symptoms"
-                description="Tell us what symptoms you're experiencing. We'll recommend the appropriate department and hospitals."
+                message="Step 1: Location & Symptoms"
+                description="Provide your current location so we can rank nearby hospitals before describing your symptoms."
                 type="info"
                 showIcon
               />
+
+              <div className="space-y-3">
+                <h4 className="font-semibold">Your Location</h4>
+                <p className="text-sm text-gray-500">Use GPS or enter coordinates manually.</p>
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <Space>
+                    <Button onClick={handleUseMyLocation} icon={<EnvironmentOutlined />}>Use my location</Button>
+                    <Button onClick={() => { setUseDeviceLocation(false); setManualLocation({}); }}>Reset</Button>
+                  </Space>
+                  {locationError && <Alert type="error" message={locationError} showIcon />}
+                  <Row gutter={12}>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Latitude" required>
+                        <Input
+                          placeholder="22.3193"
+                          value={manualLocation.latitude ?? ""}
+                          onChange={(e) => {
+                            const value = e.target.value.trim();
+                            setManualLocation((state) => ({
+                              ...state,
+                              latitude: value ? Number(value) : undefined,
+                            }));
+                          }}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Form.Item label="Longitude" required>
+                        <Input
+                          placeholder="114.1694"
+                          value={manualLocation.longitude ?? ""}
+                          onChange={(e) => {
+                            const value = e.target.value.trim();
+                            setManualLocation((state) => ({
+                              ...state,
+                              longitude: value ? Number(value) : undefined,
+                            }));
+                          }}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </Space>
+              </div>
+
               <Form.Item
                 name="symptoms"
                 label="Symptoms"
                 rules={[{ required: true, message: "Please describe your symptoms" }]}
               >
-                <TextArea
-                  rows={4}
-                  placeholder="E.g., fever, cough, headache..."
-                />
+                <TextArea rows={4} placeholder="E.g., fever, cough, headache..." />
               </Form.Item>
               <Button
                 type="primary"
                 loading={loading}
-                onClick={() => form.validateFields().then(handleSymptomAnalysis)}
+                disabled={!isLocationReady}
+                onClick={() => form.validateFields(["symptoms"]).then(handleSymptomAnalysis)}
               >
                 Analyze Symptoms
               </Button>
@@ -358,9 +428,11 @@ const BookAppointmentPage: React.FC = () => {
             <div className="space-y-4">
               <Alert
                 message={`Selected Doctor: Dr. ${selectedDoctor?.firstName} ${selectedDoctor?.lastName}`}
+                description={isLocationReady ? `Patient location: ${manualLocation.latitude?.toFixed(4)}, ${manualLocation.longitude?.toFixed(4)}` : undefined}
                 type="info"
                 showIcon
               />
+
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item label="Appointment Date" required>
@@ -386,15 +458,18 @@ const BookAppointmentPage: React.FC = () => {
                   </Form.Item>
                 </Col>
               </Row>
+
               <Form.Item name="reasonForVisit" label="Reason for Visit">
                 <Input placeholder="General consultation" />
               </Form.Item>
+
               <Alert
-                message="Booking Policy"
-                description="Appointments must be booked at least 24 hours in advance and can be scheduled up to 3 months ahead."
+                message="Need to adjust your location?"
+                description="Go back to Step 1 if you need to update your coordinates before confirming."
                 type="warning"
                 showIcon
               />
+
               <Space>
                 <Button onClick={() => setCurrentStep(3)}>Back</Button>
                 <Button

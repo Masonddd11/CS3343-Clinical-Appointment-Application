@@ -79,7 +79,18 @@ public class DataInitializer implements CommandLineRunner {
             new DoctorSeed("cardio@hospital.com", "doctor123", "Ben", "Lee", "87654321", "Cardiology", "MBBS, MRCP", "Experienced cardiologist", "Queen Elizabeth Hospital", "CAR"),
             new DoctorSeed("neuro@hospital.com", "doctor123", "Carol", "Ho", "61234567", "Neurology", "MBBS, FRCP", "Brain and nervous system specialist", "Queen Elizabeth Hospital", "NEU"),
             new DoctorSeed("ortho@hospital.com", "doctor123", "David", "Lam", "69876543", "Orthopedics", "MBBS, FRCS(Ortho)", "Bone and joint surgeon", "Princess Margaret Hospital", "ORT"),
-            new DoctorSeed("derma@hospital.com", "doctor123", "Eva", "Ng", "93456781", "Dermatology", "MBBS, MRCP(Derm)", "Skin specialist", "Queen Elizabeth Hospital", "DER")
+            new DoctorSeed("derma@hospital.com", "doctor123", "Eva", "Ng", "93456781", "Dermatology", "MBBS, MRCP(Derm)", "Skin specialist", "Queen Elizabeth Hospital", "DER"),
+            // Demo doctors for Queen Elizabeth Hospital covering all seeded departments
+            new DoctorSeed("qe-cardio@hospital.com", "doctor123", "Lydia", "Chung", "93110001", "Cardiology", "MBBS, MRCP", "Cardiologist at Kwong Wah", "Queen Elizabeth Hospital", "CAR"),
+            new DoctorSeed("qe-uro@hospital.com", "doctor123", "Michael", "Tam", "93110002", "Urology", "MBBS, FRCS", "Urology specialist at Kwong Wah", "Queen Elizabeth Hospital", "URO"),
+            new DoctorSeed("qe-neuro@hospital.com", "doctor123", "Siu", "Chan", "93110003", "Neurology", "MBBS, FRCP", "Neurologist at Kwong Wah", "Queen Elizabeth Hospital", "NEU"),
+            new DoctorSeed("qe-ortho@hospital.com", "doctor123", "Grace", "Wong", "93110004", "Orthopedics", "MBBS, FRCS(Ortho)", "Orthopedic surgeon at Kwong Wah", "Queen Elizabeth Hospital", "ORT"),
+            new DoctorSeed("qe-derm@hospital.com", "doctor123", "Victor", "Ho", "93110005", "Dermatology", "MBBS, MRCP(Derm)", "Dermatologist at Kwong Wah", "Queen Elizabeth Hospital", "DER"),
+            new DoctorSeed("qe-gast@hospital.com", "doctor123", "Anita", "Leung", "93110006", "Gastroenterology", "MBBS, FRCP", "Gastroenterologist at Kwong Wah", "Queen Elizabeth Hospital", "GAS"),
+            new DoctorSeed("qe-oph@hospital.com", "doctor123", "Thomas", "Yip", "93110007", "Ophthalmology", "MBBS, FRCOphth", "Ophthalmologist at Kwong Wah", "Queen Elizabeth Hospital", "OPH"),
+            new DoctorSeed("qe-ent@hospital.com", "doctor123", "Nancy", "Kwan", "93110008", "Otolaryngology", "MBBS, FRCS(ENT)", "ENT specialist at Kwong Wah", "Queen Elizabeth Hospital", "ENT"),
+            new DoctorSeed("qe-pul@hospital.com", "doctor123", "Eric", "Choi", "93110009", "Pulmonology", "MBBS, MRCP", "Pulmonologist at Kwong Wah", "Queen Elizabeth Hospital", "PUL"),
+            new DoctorSeed("qe-end@hospital.com", "doctor123", "Helen", "Cheung", "93110010", "Endocrinology", "MBBS, FRCP", "Endocrinologist at Kwong Wah", "Queen Elizabeth Hospital", "END")
     );
 
     private static final List<SymptomSeed> SYMPTOM_SEEDS = List.of(

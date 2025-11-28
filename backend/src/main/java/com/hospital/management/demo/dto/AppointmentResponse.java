@@ -27,8 +27,9 @@ public class AppointmentResponse {
     private LocalTime appointmentTime;
     private String reasonForVisit;
     private String symptoms;
+    private Double patientLatitude;
+    private Double patientLongitude;
     private AppointmentStatus status;
     private Double pathfindingScore;
     private String notes;
 }
-

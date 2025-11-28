@@ -94,6 +94,9 @@ public class AppointmentService {
                 .appointmentTime(request.getAppointmentTime())
                 .reasonForVisit(request.getReasonForVisit())
                 .symptoms(request.getSymptoms())
+                // include optional patient location for pathfinding
+                .patientLatitude(request.getPatientLatitude())
+                .patientLongitude(request.getPatientLongitude())
                 .status(AppointmentStatus.CONFIRMED)
                 .build();
 
@@ -252,6 +255,8 @@ public class AppointmentService {
                 .appointmentTime(appointment.getAppointmentTime())
                 .reasonForVisit(appointment.getReasonForVisit())
                 .symptoms(appointment.getSymptoms())
+                .patientLatitude(appointment.getPatientLatitude())
+                .patientLongitude(appointment.getPatientLongitude())
                 .status(appointment.getStatus())
                 .pathfindingScore(appointment.getPathfindingScore())
                 .notes(appointment.getNotes())

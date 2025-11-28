@@ -189,6 +189,7 @@ const PatientDashboard: React.FC = () => {
         </Col>
         <Col xs={24} sm={12} md={8}>
           <Card>
++
             <Button type="link" onClick={() => navigate("/book-appointment")}
               style={{ padding: 0, height: "auto" }}>
               <Statistic

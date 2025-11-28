@@ -50,6 +50,13 @@ public class Appointment {
     @Column
     private String symptoms;
 
+    // New: patient location at booking time to support pathfinding
+    @Column(name = "patient_latitude")
+    private Double patientLatitude;
+
+    @Column(name = "patient_longitude")
+    private Double patientLongitude;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
@@ -78,4 +85,3 @@ public class Appointment {
         updatedAt = LocalDateTime.now();
     }
 }
-

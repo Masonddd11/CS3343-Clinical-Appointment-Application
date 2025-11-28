@@ -30,5 +30,9 @@ public class AppointmentRequest {
     private String reasonForVisit;
 
     private String symptoms;
-}
 
+    // New: patient's current location for pathfinding (latitude, longitude)
+    private Double patientLatitude;
+
+    private Double patientLongitude;
+}
